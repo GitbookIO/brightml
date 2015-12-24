@@ -110,8 +110,8 @@ Brightml.prototype._cleanElements = function() {
         var tagName = getTagName($(this));
 
         // Remove empty tags
-        if (!$(this).html().trim()) {
-            if (!_.includes(rules.allowedEmpty, tagName)) {
+        if (!$(this).text().trim()) {
+            if (!_.includes(rules.allowedEmpty, tagName) || !_.size(getTagAttributes($(this)))) {
                 return $(this).remove();
             }
         }
@@ -136,6 +136,20 @@ Brightml.prototype._cleanElements = function() {
                     return _.startsWith(link, scheme);
                 });
                 if (!allowedLink) delete attributes[key];
+            }
+        }
+    });
+};
+
+// For <a> tags with an id attribute, set id on parent
+Brightml.prototype._setAnchorIds = function() {
+    $('a').each(function() {
+        var attributes = getTagAttributes($(this));
+        if (!!attributes.id) {
+            var parentAttributes = getTagAttributes($(this).parent());
+            if (!parentAttributes.id) {
+                parentAttributes.id = attributes.id;
+                delete attributes.id;
             }
         }
     });
@@ -167,6 +181,7 @@ Brightml.prototype.render = function() {
 
         // Cleanup elements
         console.log('Cleaning up...');
+        that._setAnchorIds();
         that._cleanElements();
         // Cleanup tables
         that._removeNestedTables();

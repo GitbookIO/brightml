@@ -14,7 +14,6 @@ module.exports = {
 
     // List of allowed empty tags
     allowedEmpty: [
-        'a',        // Used for navigation
         'th', 'td'  // Allow keeping <table> elements formatting
     ],
 
