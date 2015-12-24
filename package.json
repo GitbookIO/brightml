@@ -1,16 +1,29 @@
 {
-  "name": "brightml",
-  "version": "1.0.0",
-  "description": "Smart utility rendering markdown-ready HTML",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "GitBook Team <contact@gitbook.com>",
-  "license": "MIT",
-  "dependencies": {
-    "cheerio": "git://github.com/cheeriojs/cheerio.git#70c5608113d3efaf584efd29edafe173b74e106f",
-    "lodash": "^3.10.1",
-    "q": "^1.4.1"
-  }
+    "name": "brightml",
+    "version": "1.0.0",
+    "description": "Smart utility rendering markdown-ready HTML",
+    "main": "index.js",
+    "author": "GitBook Team <contact@gitbook.com>",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/GitbookIO/brightml.git"
+    },
+    "bugs": {
+        "url": "https://github.com/GitbookIO/brightml/issues"
+    },
+    "contributors": [
+        {
+            "name": "Johan Preynat",
+            "email": "johan@gitbook.com"
+        }
+    ],
+    "dependencies": {
+        "cheerio": "git://github.com/cheeriojs/cheerio.git#70c5608113d3efaf584efd29edafe173b74e106f",
+        "lodash": "^3.10.1",
+        "q": "^1.4.1"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    }
 }
