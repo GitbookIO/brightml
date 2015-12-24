@@ -111,7 +111,7 @@ Brightml.prototype._cleanElements = function() {
 
         // Remove empty tags
         if (!$(this).text().trim()) {
-            if (!_.includes(rules.allowedEmpty, tagName) || !_.size(getTagAttributes($(this)))) {
+            if (!_.includes(rules.allowedEmpty, tagName)) {
                 return $(this).remove();
             }
         }
