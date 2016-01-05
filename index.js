@@ -16,12 +16,13 @@ function Brightml(filename) {
 // Replace illegal markdown nested tables by a warning
 Brightml.prototype._removeNestedTables = function() {
     console.log('Removing nested tables from HTML...');
+    var message = '<b>===== Illegal nested table =====</b>';
     // Check for nested tables
     $('table').has('table').each(function() {
         // Replace nested tables by a warning message
         $(this).find('table').each(function() {
-            var replacement = $('<td><b>===== Illegal nested table =====</b> '+$(this).text()+'</td>');
-            $(this).parent().replaceWith(replacement);
+            var $replacement = $('<td>'+message+' '+$(this).text()+'</td>');
+            $(this).parent().replaceWith($replacement);
         });
     });
 };
@@ -42,17 +43,17 @@ Brightml.prototype._formatTables = function() {
             var firstChildType = getTagName($children);
 
             switch (firstChildType) {
-                // First child might be a <caption>, move it before <table>
+                // First child might be a <caption>
                 case 'caption':
                     console.log('Moving caption...');
-                    // Move <caption> before <table>
+                    // Move it before the <table> tag
                     $caption = $table.find('caption');
                     $caption.insertBefore($table);
-                    // Get actual children
+                    // Get actual remaining children to process
                     $children = $table.children();
                     firstChildType = getTagName($children);
 
-                // Case <tr>, move the first in a new <thead>, others in a new <tbody>
+                // Case <tr>, move the first in a new <thead> and the others in a new <tbody>
                 case 'tr':
                     // Encapsulate first <tr> in a new <thead>
                     $thead = $('<thead></thead>');
@@ -64,14 +65,14 @@ Brightml.prototype._formatTables = function() {
                     $tbody.insertAfter($thead);
                     break;
 
-                // Case <tbody>, move first <tr> in new <thead>
+                // Case <tbody>, move the first <tr> in new <thead>
                 case 'tbody':
                     // Create <thead>
                     $thead = $('<thead></thead>');
                     // Capture <tbody>
                     $tbody = $(this).find('tbody');
 
-                    // Encapsulate first <tr> in a <thead>
+                    // Encapsulate the first <tr> in a <thead>
                     $tbody.children().first().wrap($thead);
                     // Move <thead> before <tbody>
                     $tbody.children().first().insertBefore($tbody);
@@ -141,7 +142,7 @@ Brightml.prototype._cleanElements = function() {
     });
 };
 
-// For <a> tags with an id attribute, set id on parent
+// For empty <a> tags with an id attribute, set id on parent
 Brightml.prototype._setAnchorIds = function() {
     $('a').each(function() {
         var attributes = getTagAttributes($(this));
@@ -157,12 +158,12 @@ Brightml.prototype._setAnchorIds = function() {
 
 // Return a tag name in lower case
 function getTagName(el) {
-    return el[0].name.toLowerCase();
+    return el.get(0).name.toLowerCase();
 }
 
 // Return the tag attributes
 function getTagAttributes(el) {
-    return el[0].attribs;
+    return el.get(0).attribs;
 }
 
 // Process HTML
