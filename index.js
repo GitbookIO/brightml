@@ -156,6 +156,61 @@ Brightml.prototype._setAnchorIds = function() {
     });
 };
 
+// Move local referenced tags before next <h1>
+Brightml.prototype._moveLocalReferences = function() {
+    $('a').each(function() {
+        // Check if href is an id link
+        var attributes = getTagAttributes($(this));
+        var href = attributes.href;
+
+        if (!!href && _.startsWith(href, '#')) {
+            // Get referenced element
+            var $referencedTag = $(href);
+
+            // Check existence
+            if (!_.isUndefined($referencedTag.get(0))) {
+                var $nextH1 = getNextH1($(this));
+                // Move before next <h1> if found
+                if (!_.isNull($nextH1)) {
+                    // Change to a <p> before moving
+                    var $replacement;
+                    if ($referencedTag.children().length === 1 && $referencedTag.children().first().is('p')) {
+                        $replacement = $referencedTag.children().first();
+                    }
+                    else {
+                        $replacement = $('<p>'+$referencedTag.html()+'</p>');
+                    }
+
+                    // Copy attributes
+                    var referencedTagAttributes = getTagAttributes($referencedTag);
+                    for (var attr in referencedTagAttributes) {
+                        $replacement.attr(attr, referencedTagAttributes[attr]);
+                    }
+                    // Replace and move
+                    $referencedTag.replaceWith($replacement);
+                    $replacement.insertBefore($nextH1);
+                }
+            }
+        }
+    });
+};
+
+// Return the closest <h1> to an element
+function getNextH1(el) {
+    // Try to get next sibling
+    var $nextH1 = el.nextAll('h1').get(0);
+
+    // Switch element to its parent while not found
+    while (_.isUndefined($nextH1)) {
+        el = el.parent();
+        // Return null if element has no parent
+        if (_.isUndefined(el.get(0))) return null;
+        $nextH1 = el.nextAll('h1').get(0);
+    }
+
+    return $nextH1;
+};
+
 // Return a tag name in lower case
 function getTagName(el) {
     return el.get(0).name.toLowerCase();
@@ -182,8 +237,9 @@ Brightml.prototype.render = function() {
 
         // Cleanup elements
         console.log('Cleaning up...');
-        that._setAnchorIds();
         that._cleanElements();
+        that._setAnchorIds();
+        that._moveLocalReferences();
         // Cleanup tables
         that._removeNestedTables();
         that._formatTables();
