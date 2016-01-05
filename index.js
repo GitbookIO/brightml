@@ -1,22 +1,16 @@
 var fs = require('fs');
 
 var _ = require('lodash');
-var Q = require('q');
 var cheerio = require('cheerio');
 
 var rules = require('./rules');
 
-// Main cheerio object
+// Main DOM object
 var $;
 
-function Brightml(filename) {
-    this.filename = filename;
-};
-
 // Replace illegal markdown nested tables by a warning
-Brightml.prototype._removeNestedTables = function() {
-    console.log('Removing nested tables from HTML...');
-    var message = '<b>===== Illegal nested table =====</b>';
+function removeNestedTables() {
+    var message = '<b>Illegal nested table :</b>';
     // Check for nested tables
     $('table').has('table').each(function() {
         // Replace nested tables by a warning message
@@ -31,8 +25,7 @@ Brightml.prototype._removeNestedTables = function() {
 // Move <caption> if any before <table>
 // Ensure there is a <thead> containing one <tr> with <th> elements
 // The rest is in <tbody> in <td> elements
-Brightml.prototype._formatTables = function() {
-    console.log('Properly formatting tables...');
+function formatTables() {
     $('table').each(function() {
         $table = $(this);
         // If <table> has children
@@ -42,17 +35,17 @@ Brightml.prototype._formatTables = function() {
             // Get first child type
             var firstChildType = getTagName($children);
 
-            switch (firstChildType) {
-                // First child might be a <caption>
-                case 'caption':
-                    console.log('Moving caption...');
-                    // Move it before the <table> tag
-                    $caption = $table.find('caption');
-                    $caption.insertBefore($table);
-                    // Get actual remaining children to process
-                    $children = $table.children();
-                    firstChildType = getTagName($children);
+            // First child might be a <caption>
+            if (firstChildType === 'caption') {
+                // Move it before the <table> tag
+                $caption = $table.find('caption');
+                $caption.insertBefore($table);
+                // Get actual remaining children to process
+                $children = $table.children();
+                firstChildType = getTagName($children);
+            }
 
+            switch (firstChildType) {
                 // Case <tr>, move the first in a new <thead> and the others in a new <tbody>
                 case 'tr':
                     // Encapsulate first <tr> in a new <thead>
@@ -93,8 +86,7 @@ Brightml.prototype._formatTables = function() {
 };
 
 // Remove <p> from <th>/<td> table cells
-Brightml.prototype._cleanTableCells = function() {
-    console.log('Cleaning up tables cells...');
+function cleanTableCells() {
     $('td, th').has('p').each(function() {
         // Get paragraph content
         var content = $(this).find('p').html();
@@ -105,7 +97,7 @@ Brightml.prototype._cleanTableCells = function() {
 
 // Remove empty or forbidden tags
 // Clean up attributes
-Brightml.prototype._cleanElements = function() {
+function cleanElements() {
     // Iterate over elements
     $('*').each(function() {
         var tagName = getTagName($(this));
@@ -143,7 +135,7 @@ Brightml.prototype._cleanElements = function() {
 };
 
 // For empty <a> tags with an id attribute, set id on parent
-Brightml.prototype._setAnchorIds = function() {
+function setAnchorsId() {
     $('a').each(function() {
         var attributes = getTagAttributes($(this));
         if (!!attributes.id) {
@@ -157,7 +149,7 @@ Brightml.prototype._setAnchorIds = function() {
 };
 
 // Move local referenced tags before next <h1>
-Brightml.prototype._moveLocalReferences = function() {
+function moveLocalReferences() {
     $('a').each(function() {
         // Check if href is an id link
         var attributes = getTagAttributes($(this));
@@ -221,40 +213,39 @@ function getTagAttributes(el) {
     return el.get(0).attribs;
 }
 
-// Process HTML
-Brightml.prototype.render = function() {
-    var d = Q.defer();
+function parse(html) {
+    $ = cheerio.load(html);
+}
 
-    var that = this;
+function render() {
+    return $.html();
+}
 
-    // Read file and convert to DOM using cheerio
-    console.log('Reading HTML file: '+that.filename);
-    Q.nfcall(fs.readFile, this.filename)
-    .then(function(data) {
-        // Convert to DOM using cheerio
-        console.log('Parsing HTML...');
-        $ = cheerio.load(data);
+// Process an HTML string
+function clean(html) {
+    // Convert to DOM using cheerio
+    parse(html);
 
-        // Cleanup elements
-        console.log('Cleaning up...');
-        that._cleanElements();
-        that._setAnchorIds();
-        that._moveLocalReferences();
-        // Cleanup tables
-        that._removeNestedTables();
-        that._formatTables();
-        that._cleanTableCells();
+    // Cleanup elements
+    setAnchorsId();
+    moveLocalReferences();
+    cleanElements();
+    // Cleanup tables
+    removeNestedTables();
+    formatTables();
+    cleanTableCells();
 
-        console.log('Done.');
-        return d.resolve($.html());
-    })
-    .fail(function(err) {
-        console.log('Error reading HTML file.');
-        console.log(err.stack);
-        return d.reject(err);
-    });
-
-    return d.promise;
+    return render();
 };
 
-module.exports = Brightml;
+module.exports = {
+    clean: clean,
+    parse: parse,
+    render: render,
+    cleanElements: cleanElements,
+    setAnchorsId: setAnchorsId,
+    moveLocalReferences: moveLocalReferences,
+    removeNestedTables: removeNestedTables,
+    formatTables: formatTables,
+    cleanTableCells: cleanTableCells
+};

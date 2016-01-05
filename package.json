@@ -1,29 +1,32 @@
 {
-    "name": "brightml",
-    "version": "1.0.0",
-    "description": "Smart utility rendering markdown-ready HTML",
-    "main": "index.js",
-    "author": "GitBook Team <contact@gitbook.com>",
-    "license": "Apache-2.0",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/GitbookIO/brightml.git"
-    },
-    "bugs": {
-        "url": "https://github.com/GitbookIO/brightml/issues"
-    },
-    "contributors": [
-        {
-            "name": "Johan Preynat",
-            "email": "johan@gitbook.com"
-        }
-    ],
-    "dependencies": {
-        "cheerio": "git://github.com/cheeriojs/cheerio.git#70c5608113d3efaf584efd29edafe173b74e106f",
-        "lodash": "^3.10.1",
-        "q": "^1.4.1"
-    },
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+  "name": "brightml",
+  "version": "2.0.0",
+  "description": "Smart utility rendering markdown-ready HTML",
+  "main": "index.js",
+  "author": "GitBook Team <contact@gitbook.com>",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GitbookIO/brightml.git"
+  },
+  "bugs": {
+    "url": "https://github.com/GitbookIO/brightml/issues"
+  },
+  "contributors": [
+    {
+      "name": "Johan Preynat",
+      "email": "johan@gitbook.com"
     }
+  ],
+  "dependencies": {
+    "cheerio": "git://github.com/cheeriojs/cheerio.git#70c5608113d3efaf584efd29edafe173b74e106f",
+    "lodash": "^3.10.1"
+  },
+  "scripts": {
+    "test": "node_modules/.bin/mocha -b --reporter spec --timeout 5000"
+  },
+  "devDependencies": {
+    "mocha": "^2.3.4",
+    "should": "^8.0.2"
+  }
 }
