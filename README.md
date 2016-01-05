@@ -60,8 +60,10 @@ Used schema :
 <table>
   <!-- Ensure the first row contains <th> tags in a <thead> element -->
   <thead>
-    <th>Title 1</th>
-    <th>Title 2</th>
+    <tr>
+      <th>Title 1</th>
+      <th>Title 2</th>
+    </tr>
   </thead>
   <!-- Ensure all remaining rows are inside a <tbody> element -->
   <tbody>
