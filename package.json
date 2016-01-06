@@ -1,6 +1,6 @@
 {
   "name": "brightml",
-  "version": "2.0.1",
+  "version": "3.0.0",
   "description": "Smart utility rendering markdown-ready HTML",
   "main": "index.js",
   "author": "GitBook Team <contact@gitbook.com>",
