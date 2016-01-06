@@ -103,7 +103,7 @@ function cleanElements() {
         var tagName = getTagName($(this));
 
         // Remove empty tags
-        if (!$(this).html().trim()) {
+        if (!$(this).text().trim()) {
             if (!_.includes(rules.allowedEmpty, tagName)) {
                 return $(this).remove();
             }
@@ -158,46 +158,69 @@ function setAnchorsId() {
     });
 };
 
-// Move local referenced tags before next <h1>
-// Prevent moving title tags
-function moveLocalReferences() {
+// Move footnotes before next <h1>
+function retrieveFootnotes() {
     $('a').each(function() {
-        // Check if href is an id link
+        // Get origin id and href attributes
         var attributes = getTagAttributes($(this));
-        var href = attributes.href;
+        var originHref = attributes.href;
+        var originId = attributes.id;
 
-        if (!!href && _.startsWith(href, '#')) {
+        // originId could also be set on parent <sup> tag
+        if (!originId) {
+            var $parent = $(this).parent();
+            if (!$parent.length) return;
+
+            var parentTag = getTagName($parent);
+            if (parentTag !== 'sup') return;
+
+            var parentAttributes = getTagAttributes($parent);
+            originId = parentAttributes.id;
+        }
+
+        // Both id and href must be set in a footnote origin link
+        if (!originHref || !originId) return;
+
+        // Check if href is an id-like link
+        if (_.startsWith(originHref, '#')) {
             // Get referenced element
-            var $referencedTag = $(href);
+            var $referencedTag = $(originHref);
             if (!$referencedTag.length) return;
 
-            var tagName = getTagName($referencedTag);
-            if (_.startsWith(tagName, 'h')) return;
+            // Check that referred element has a link back to origin
+            var $linkToOrigin = $('a[id="'+originId+'"]');
+            if (!$referencedTag.has($linkToOrigin)) return;
 
-            // Check existence
-            if (!_.isUndefined($referencedTag.get(0))) {
-                var $nextH1 = getNextH1($(this));
-                // Move before next <h1> if found
-                if (!_.isNull($nextH1)) {
-                    // Change to a <p> before moving
-                    var $replacement;
-                    if ($referencedTag.children().length === 1 && $referencedTag.children().first().is('p')) {
-                        $replacement = $referencedTag.children().first();
-                    }
-                    else {
-                        $replacement = $('<p>'+$referencedTag.html()+'</p>');
-                    }
+            // Find next <h1> tag
+            var $nextH1 = getNextH1($(this));
+            if (_.isNull($nextH1)) return;
 
-                    // Copy attributes
-                    var referencedTagAttributes = getTagAttributes($referencedTag);
-                    for (var attr in referencedTagAttributes) {
-                        $replacement.attr(attr, referencedTagAttributes[attr]);
-                    }
-                    // Replace and move
-                    $referencedTag.replaceWith($replacement);
-                    $replacement.insertBefore($nextH1);
-                }
+            // Change referred element to a <p> tag
+            var $replacement;
+            if ($referencedTag.children().length === 1 && $referencedTag.children().first().is('p')) {
+                $replacement = $referencedTag.children().first();
             }
+            else {
+                $replacement = $('<p>'+$referencedTag.html()+'</p>');
+            }
+
+            // Wrap content in a <sup> tag if not already and prepend content with origin link text
+            if ($replacement.children().first().is('sup')) {
+                $replacement.children().first().html($(this).text()+' '+$replacement.children().first().html());
+            }
+            else {
+                $replacement.html('<sup>'+$(this).text()+' '+$replacement.html().trim()+'</sup>');
+            }
+
+            // Copy attributes
+            var referencedTagAttributes = getTagAttributes($referencedTag);
+            for (var attr in referencedTagAttributes) {
+                $replacement.children().first().attr(attr, referencedTagAttributes[attr]);
+            }
+
+            // Replace element and move before next <h1>
+            $referencedTag.replaceWith($replacement);
+            $replacement.insertBefore($nextH1);
         }
     });
 };
@@ -242,9 +265,9 @@ function clean(html) {
     parse(html);
 
     // Cleanup elements
+    retrieveFootnotes();
     setAnchorsId();
     cleanElements();
-    moveLocalReferences();
     // Cleanup tables
     removeNestedTables();
     formatTables();
@@ -259,7 +282,7 @@ module.exports = {
     render: render,
     cleanElements: cleanElements,
     setAnchorsId: setAnchorsId,
-    moveLocalReferences: moveLocalReferences,
+    retrieveFootnotes: retrieveFootnotes,
     removeNestedTables: removeNestedTables,
     formatTables: formatTables,
     cleanTableCells: cleanTableCells

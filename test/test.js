@@ -214,40 +214,73 @@ describe('brightml.setAnchorsId()', function() {
     });
 });
 
-describe('brightml.moveLocalReferences()', function() {
+describe('brightml.retrieveFootnotes()', function() {
     it('should move the referenced <p> tag before the next <h1> tag', function() {
         var input = '<h1>Part 1</h1>'+
         '<p>'+
-            '<a href="#first-distant-paragraph">Link to first paragraph</a>'+
-            'Sample text'+
+            'Sample footnote'+
+            '<sup id="footnote-1-ref">'+
+                '<a href="#footnote-1">1</a>'+
+            '</sup>'+
         '</p>'+
-        '<a href="#second-distant-paragraph">Link to second paragraph</a>'+
+        '<p>'+
+            'Second footnote'+
+            '<sup>'+
+                '<a id="footnote-2-ref" href="#footnote-2">2</a>'+
+            '</sup>'+
+        '</p>'+
         '<h1>Part 2</h1>'+
-        '<p id="first-distant-paragraph">'+
-            'This should move'+
+        '<p>Some content</p>'+
+        '<p>'+
+            '<sup id="footnote-1">'+
+                'This should move '+
+                '<a href="#footnote-1-ref">back</a>'+
+            '</sup>'+
         '</p>'+
         '<h1>Part 3</h1>'+
-        '<p id="second-distant-paragraph">'+
-            'This too'+
-        '</p>';
+        '<ol>'+
+            '<li id="footnote-2">'+
+                '<sup>'+
+                    'This too '+
+                    '<a href="#footnote-2-ref">back</a>'+
+                '</sup>'+
+            '</li>'+
+        '</ol>';
 
         var correctOutput = '<h1>Part 1</h1>'+
         '<p>'+
-            '<a href="#first-distant-paragraph">Link to first paragraph</a>'+
-            'Sample text'+
+            'Sample footnote'+
+            '<sup id="footnote-1-ref">'+
+                '<a href="#footnote-1">1</a>'+
+            '</sup>'+
         '</p>'+
-        '<a href="#second-distant-paragraph">Link to second paragraph</a>'+
-        '<p id="first-distant-paragraph">'+
-            'This should move'+
+        '<p>'+
+            'Second footnote'+
+            '<sup>'+
+                '<a id="footnote-2-ref" href="#footnote-2">2</a>'+
+            '</sup>'+
         '</p>'+
-        '<p id="second-distant-paragraph">'+
-            'This too'+
+        '<p>'+
+            '<sup id="footnote-1">'+
+                '1 This should move '+
+                '<a href="#footnote-1-ref">back</a>'+
+            '</sup>'+
+        '</p>'+
+        '<p>'+
+            '<sup id="footnote-2">'+
+                '2 This too '+
+                '<a href="#footnote-2-ref">back</a>'+
+            '</sup>'+
         '</p>'+
         '<h1>Part 2</h1>'+
-        '<h1>Part 3</h1>';
+        '<p>Some content</p>'+
+        '<p></p>'+
+        '<h1>Part 3</h1>'+
+        '<ol>'+
+        '</ol>';
 
         brightml.parse(input);
-        brightml.moveLocalReferences();
+        brightml.retrieveFootnotes();
         var output = brightml.render();
 
         output.should.be.equal(correctOutput);
@@ -337,23 +370,37 @@ describe('brightml.clean()', function() {
     it('should do all this at once', function() {
         var input = '<h1 id="first-title" title="part-1">Part 1</h1>'+
         '<p>'+
-            '<a id="first-paragraph"></a>'+
-            '<a href="#first-distant-paragraph">Link to first paragraph</a>'+
-            'Sample text'+
-        '</p>'+
-        '<a href="#second-distant-paragraph">Link to second paragraph</a>'+
-        '<h1>Part 2</h1>'+
-        '<p id="first-distant-paragraph">'+
+            'Sample footnote'+
+            '<sup id="footnote-1-ref">'+
+                '<a href="#footnote-1">1</a>'+
+            '</sup>'+
             '<a href="http://lost.com"></a>'+
             '<img src="./logo.png">'+
-            'This should move'+
+        '</p>'+
+        '<p>'+
+            '<memo>This should become a span</memo> '+
+            'Second footnote'+
+            '<sup>'+
+                '<a id="footnote-2-ref" href="#footnote-2">2</a>'+
+            '</sup>'+
+        '</p>'+
+        '<h1>Part 2</h1>'+
+        '<p>Some content</p>'+
+        '<p>'+
+            '<sup id="footnote-1">'+
+                'This should move '+
+                '<a href="#footnote-1-ref">back</a>'+
+            '</sup>'+
         '</p>'+
         '<h1>Part 3</h1>'+
-        '<p id="second-distant-paragraph">'+
-            '<a id="fake-second-distant-paragraph"></a>'+
-            'This too'+
-            '<memo>This should become a span</memo>'+
-        '</p>'+
+        '<ol>'+
+            '<li id="footnote-2">'+
+                '<sup>'+
+                    'This too '+
+                    '<a href="#footnote-2-ref">back</a>'+
+                '</sup>'+
+            '</li>'+
+        '</ol>'+
         '<table>'+
             '<caption>Data table</caption>'+
             '<tr><td>Title 1</td><td>Title 2</td></tr>'+
@@ -364,20 +411,34 @@ describe('brightml.clean()', function() {
         '</table>';
 
         var correctOutput = '<h1 id="first-title">Part 1</h1>'+
-        '<p id="first-paragraph">'+
-            '<a href="#first-distant-paragraph">Link to first paragraph</a>'+
-            'Sample text'+
-        '</p>'+
-        '<a href="#second-distant-paragraph">Link to second paragraph</a>'+
-        '<p id="first-distant-paragraph">'+
+        '<p>'+
+            'Sample footnote'+
+            '<sup id="footnote-1-ref">'+
+                '<a href="#footnote-1">1</a>'+
+            '</sup>'+
             '<img src="./logo.png">'+
-            'This should move'+
         '</p>'+
-        '<p id="second-distant-paragraph">'+
-            'This too'+
-            '<span><b>Illegal HTML tag removed : </b>This should become a span</span>'+
+        '<p>'+
+            '<span><b>Illegal HTML tag removed : </b>This should become a span</span> '+
+            'Second footnote'+
+            '<sup id="footnote-2-ref">'+
+                '<a href="#footnote-2">2</a>'+
+            '</sup>'+
+        '</p>'+
+        '<p>'+
+            '<sup id="footnote-1">'+
+                '1 This should move '+
+                '<a href="#footnote-1-ref">back</a>'+
+            '</sup>'+
+        '</p>'+
+        '<p>'+
+            '<sup id="footnote-2">'+
+                '2 This too '+
+                '<a href="#footnote-2-ref">back</a>'+
+            '</sup>'+
         '</p>'+
         '<h1>Part 2</h1>'+
+        '<p>Some content</p>'+
         '<h1>Part 3</h1>'+
         '<caption>Data table</caption>'+
         '<table>'+
