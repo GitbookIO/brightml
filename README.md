@@ -74,10 +74,6 @@ Convert HTML to DOM using [cheerio](https://github.com/cheeriojs/cheerio).
 
 Try to set `<a>` tags `id` attribute on their direct parent if possible.
 
-#### brightml.moveLocalReferences()
-
-For each `<a>` tag's `href` attribute local link, move the referenced HTML element before the next `<h1>` tag. This feature is used to prevent breaking of local links and keep them in sight.
-
 #### brightml.cleanElements()
 
 * Remove empty tags.
@@ -86,6 +82,10 @@ For each `<a>` tag's `href` attribute local link, move the referenced HTML eleme
 * Remove unallowed links schema in HTML attributes.
 
 This operation uses the `rules.js` file to determine which tags/attributes/schemes are allowed.
+
+#### brightml.moveLocalReferences()
+
+For each `<a>` tag's `href` attribute local link, move the referenced HTML element before the next `<h1>` tag. This feature is used to prevent breaking of local links and keep them in sight.
 
 #### brightml.removeNestedTables()
 
