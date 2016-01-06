@@ -103,7 +103,7 @@ function cleanElements() {
         var tagName = getTagName($(this));
 
         // Remove empty tags
-        if (!$(this).text().trim()) {
+        if (!$(this).html().trim()) {
             if (!_.includes(rules.allowedEmpty, tagName)) {
                 return $(this).remove();
             }
@@ -111,8 +111,18 @@ function cleanElements() {
 
         // Remove forbidden HTML tags
         if (!rules.allowed[tagName]) {
-            // Set content in a paragraph
-            $(this).replaceWith('<p><b>Illegal HTML tag removed : </b>'+$(this).html()+'</p>');
+            // Set content in a <p> tag or in a <span> if parent is a <p>
+            var warning = '<b>Illegal HTML tag removed : </b>'+$(this).html();
+
+            var $container = $('<p></p>');
+            var $parent = $(this).parent();
+            var parentTag;
+
+            if (!!$parent.length) parentTag = getTagName($parent);
+            if (parentTag === 'p') $container = $('<span></span>');
+            $container.html(warning);
+
+            $(this).replaceWith($container);
             return;
         }
 
@@ -149,6 +159,7 @@ function setAnchorsId() {
 };
 
 // Move local referenced tags before next <h1>
+// Prevent moving title tags
 function moveLocalReferences() {
     $('a').each(function() {
         // Check if href is an id link
@@ -158,6 +169,10 @@ function moveLocalReferences() {
         if (!!href && _.startsWith(href, '#')) {
             // Get referenced element
             var $referencedTag = $(href);
+            if (!$referencedTag.length) return;
+
+            var tagName = getTagName($referencedTag);
+            if (_.startsWith(tagName, 'h')) return;
 
             // Check existence
             if (!_.isUndefined($referencedTag.get(0))) {
@@ -228,8 +243,8 @@ function clean(html) {
 
     // Cleanup elements
     setAnchorsId();
-    moveLocalReferences();
     cleanElements();
+    moveLocalReferences();
     // Cleanup tables
     removeNestedTables();
     formatTables();

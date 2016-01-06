@@ -277,13 +277,15 @@ describe('brightml.cleanElements()', function() {
     it('should remove unallowed tags', function() {
         var input = '<p>'+
             'Sample text'+
-            '<memo>This is a fictious tag</memo>'+
-        '</p>';
+            '<memo>This should become a span</memo>'+
+        '</p>'+
+        '<memo>This should turn into a p</memo>';
 
         var correctOutput = '<p>'+
             'Sample text'+
-            '<p><b>Illegal HTML tag removed : </b>This is a fictious tag</p>'+
-        '</p>';
+            '<span><b>Illegal HTML tag removed : </b>This should become a span</span>'+
+        '</p>'+
+        '<p><b>Illegal HTML tag removed : </b>This should turn into a p</p>';
 
         brightml.parse(input);
         brightml.cleanElements();
@@ -350,7 +352,7 @@ describe('brightml.clean()', function() {
         '<p id="second-distant-paragraph">'+
             '<a id="fake-second-distant-paragraph"></a>'+
             'This too'+
-            '<memo>This is a fictious tag</memo>'+
+            '<memo>This should become a span</memo>'+
         '</p>'+
         '<table>'+
             '<caption>Data table</caption>'+
@@ -373,7 +375,7 @@ describe('brightml.clean()', function() {
         '</p>'+
         '<p id="second-distant-paragraph">'+
             'This too'+
-            '<p><b>Illegal HTML tag removed : </b>This is a fictious tag</p>'+
+            '<span><b>Illegal HTML tag removed : </b>This should become a span</span>'+
         '</p>'+
         '<h1>Part 2</h1>'+
         '<h1>Part 3</h1>'+
