@@ -70,6 +70,26 @@ Using `brightml.clean(html)` performs the following operations in order.
 
 Convert HTML to DOM using [cheerio](https://github.com/cheeriojs/cheerio).
 
+#### brightml.retrieveFootNotes()
+
+For cross-referenced links, handle retrieving the foot/endnotes before the next `<h1>` tag to keep notes within a chapter section.
+
+The footnotes are then formatted as follow:
+
+```HTML
+<h1>Footnotes</h1>
+<p>
+  See how to properly format a footnote<sup id="footnote-ref"><a href="#footnote">1</a></sup>.
+</p>
+<!-- Some more content -->
+<p>
+  <sup id="footnote">
+    Footnotes are in a paragraph and a sup tag. Link to go back to reference is at the end of the footnote.
+    <a href="#footnote-ref"></a>
+  </sup>
+</p>
+```
+
 #### brightml.setAnchorsId()
 
 Try to set `<a>` tags `id` attribute on their direct parent if possible.
@@ -82,10 +102,6 @@ Try to set `<a>` tags `id` attribute on their direct parent if possible.
 * Remove unallowed links schema in HTML attributes.
 
 This operation uses the `rules.js` file to determine which tags/attributes/schemes are allowed.
-
-#### brightml.moveLocalReferences()
-
-For each `<a>` tag's `href` attribute local link, move the referenced HTML element before the next `<h1>` tag. This feature is used to prevent breaking of local links and keep them in sight.
 
 #### brightml.removeNestedTables()
 
