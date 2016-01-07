@@ -217,11 +217,11 @@ describe('brightml.setAnchorsId()', function() {
 describe('brightml.normalizeTitlesId()', function() {
     it('should change the title id', function() {
         var input = '<h1 id="345-is-a-weird-id">'+
-            'Sample title'+
+            'Complex_title 101&amp;# Others'+
         '</h1>';
 
-        var correctOutput = '<h1 id="sample_title">'+
-            'Sample title'+
+        var correctOutput = '<h1 id="complex-title-101-others">'+
+            'Complex_title 101&amp;# Others'+
         '</h1>';
 
         brightml.parse(input);
@@ -239,10 +239,10 @@ describe('brightml.normalizeTitlesId()', function() {
             'Go back'+
         '</a>';
 
-        var correctOutput = '<h2 id="a_great_title">'+
+        var correctOutput = '<h2 id="a-great-title">'+
             'A great title'+
         '</h2>'+
-        '<a href="#a_great_title">'+
+        '<a href="#a-great-title">'+
             'Go back'+
         '</a>';
 
@@ -450,7 +450,7 @@ describe('brightml.clean()', function() {
             '<tr><td><p>Data 2.1</p></td><td><p>Data 2.2</p></td></tr>'+
         '</table>';
 
-        var correctOutput = '<h1 id="part_1">Part 1</h1>'+
+        var correctOutput = '<h1 id="part-1">Part 1</h1>'+
         '<p>'+
             'Sample footnote'+
             '<sup id="footnote-1-ref">'+
@@ -477,9 +477,9 @@ describe('brightml.clean()', function() {
                 '<a href="#footnote-2-ref">back</a>'+
             '</sup>'+
         '</p>'+
-        '<h1 id="part_2">Part 2</h1>'+
+        '<h1 id="part-2">Part 2</h1>'+
         '<p>Some content</p>'+
-        '<h1 id="part_3">Part 3</h1>'+
+        '<h1 id="part-3">Part 3</h1>'+
         '<caption>Data table</caption>'+
         '<table>'+
             '<thead>'+

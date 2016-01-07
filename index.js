@@ -2,7 +2,6 @@ var fs = require('fs');
 
 var _ = require('lodash');
 var cheerio = require('cheerio');
-var normall = require('normall');
 
 var rules = require('./rules');
 
@@ -155,7 +154,7 @@ function normalizeTitlesId() {
         $(title).each(function() {
             // Compute new id
             var oldId = $(this).attr('id');
-            var textId = normall.filename($(this).text());
+            var textId = normalizeId($(this).text());
 
             var newId = textId;
             counter = 0;
@@ -173,6 +172,15 @@ function normalizeTitlesId() {
             $(this).attr('id', newId);
         });
     });
+};
+
+// Normalize an id
+function normalizeId(id) {
+    // Replace any non alpha-numeric character by an hyphen
+    id = id.replace(/[^a-zA-Z\d]+/g, '-');
+    // Make lowercase
+    id = id.toLowerCase();
+    return id;
 };
 
 // For empty <a> tags with an id attribute, set id on parent
