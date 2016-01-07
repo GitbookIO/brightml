@@ -2,6 +2,7 @@ var fs = require('fs');
 
 var _ = require('lodash');
 var cheerio = require('cheerio');
+var normall = require('normall');
 
 var rules = require('./rules');
 
@@ -144,6 +145,36 @@ function cleanElements() {
     });
 };
 
+// Normalize titles id based on title text
+function normalizeTitlesId() {
+    var titles = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+    var ids = [];
+    var counter;
+
+    titles.forEach(function(title) {
+        $(title).each(function() {
+            // Compute new id
+            var oldId = $(this).attr('id');
+            var textId = normall.filename($(this).text());
+
+            var newId = textId;
+            counter = 0;
+            while (_.includes(ids, newId)) {
+                newId = textId+'-'+counter;
+            }
+            // Prevent obtaining the same id twice
+            ids.push(newId);
+
+            // Replace id in href links
+            $('*[href="#'+oldId+'"]').each(function() {
+                $(this).attr('href', '#'+newId);
+            });
+            // Replace title id
+            $(this).attr('id', newId);
+        });
+    });
+};
+
 // For empty <a> tags with an id attribute, set id on parent
 function setAnchorsId() {
     $('a').each(function() {
@@ -268,6 +299,7 @@ function clean(html) {
     retrieveFootnotes();
     setAnchorsId();
     cleanElements();
+    normalizeTitlesId();
     // Cleanup tables
     removeNestedTables();
     formatTables();
@@ -283,6 +315,7 @@ module.exports = {
     cleanElements: cleanElements,
     setAnchorsId: setAnchorsId,
     retrieveFootnotes: retrieveFootnotes,
+    normalizeTitlesId: normalizeTitlesId,
     removeNestedTables: removeNestedTables,
     formatTables: formatTables,
     cleanTableCells: cleanTableCells

@@ -214,6 +214,46 @@ describe('brightml.setAnchorsId()', function() {
     });
 });
 
+describe('brightml.normalizeTitlesId()', function() {
+    it('should change the title id', function() {
+        var input = '<h1 id="345-is-a-weird-id">'+
+            'Sample title'+
+        '</h1>';
+
+        var correctOutput = '<h1 id="sample_title">'+
+            'Sample title'+
+        '</h1>';
+
+        brightml.parse(input);
+        brightml.normalizeTitlesId();
+        var output = brightml.render();
+
+        output.should.be.equal(correctOutput);
+    });
+
+    it('should replace references to title id', function() {
+        var input = '<h2 id="another-strange-id">'+
+            'A great title'+
+        '</h2>'+
+        '<a href="#another-strange-id">'+
+            'Go back'+
+        '</a>';
+
+        var correctOutput = '<h2 id="a_great_title">'+
+            'A great title'+
+        '</h2>'+
+        '<a href="#a_great_title">'+
+            'Go back'+
+        '</a>';
+
+        brightml.parse(input);
+        brightml.normalizeTitlesId();
+        var output = brightml.render();
+
+        output.should.be.equal(correctOutput);
+    });
+});
+
 describe('brightml.retrieveFootnotes()', function() {
     it('should move the referenced <p> tag before the next <h1> tag', function() {
         var input = '<h1>Part 1</h1>'+
@@ -410,7 +450,7 @@ describe('brightml.clean()', function() {
             '<tr><td><p>Data 2.1</p></td><td><p>Data 2.2</p></td></tr>'+
         '</table>';
 
-        var correctOutput = '<h1 id="first-title">Part 1</h1>'+
+        var correctOutput = '<h1 id="part_1">Part 1</h1>'+
         '<p>'+
             'Sample footnote'+
             '<sup id="footnote-1-ref">'+
@@ -437,9 +477,9 @@ describe('brightml.clean()', function() {
                 '<a href="#footnote-2-ref">back</a>'+
             '</sup>'+
         '</p>'+
-        '<h1>Part 2</h1>'+
+        '<h1 id="part_2">Part 2</h1>'+
         '<p>Some content</p>'+
-        '<h1>Part 3</h1>'+
+        '<h1 id="part_3">Part 3</h1>'+
         '<caption>Data table</caption>'+
         '<table>'+
             '<thead>'+
