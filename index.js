@@ -160,6 +160,7 @@ function normalizeTitlesId() {
             counter = 0;
             while (_.includes(ids, newId)) {
                 newId = textId+'-'+counter;
+                counter++;
             }
             // Prevent obtaining the same id twice
             ids.push(newId);
