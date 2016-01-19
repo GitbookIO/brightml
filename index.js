@@ -131,6 +131,7 @@ function cleanElements() {
         for (var key in attributes) {
             if (!_.includes(rules.allowedAttributes, key) && !_.includes(rules.allowed[tagName], key)) {
                 delete attributes[key];
+                continue;
             }
             // Filter schemes
             if (_.includes(rules.schemaAttributes, key)) {
@@ -138,8 +139,14 @@ function cleanElements() {
                 var allowedLink = rules.allowedSchemes.some(function(scheme) {
                     return _.startsWith(link, scheme);
                 });
-                if (!allowedLink) delete attributes[key];
+                if (!allowedLink) {
+                    delete attributes[key];
+                    continue;
+                }
             }
+
+            // Replace line-breaks in attributes
+            attributes[key] = attributes[key].replace(/[\n\r\t\v]/g, ' ').trim();
         }
     });
 };
