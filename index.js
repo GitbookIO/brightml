@@ -103,7 +103,7 @@ function cleanElements() {
         var tagName = getTagName($(this));
 
         // Remove empty tags
-        if (!$(this).text().trim()) {
+        if (!$(this).html().trim()) {
             if (!_.includes(rules.allowedEmpty, tagName)) {
                 return $(this).remove();
             }
