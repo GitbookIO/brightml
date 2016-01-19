@@ -196,6 +196,9 @@ function setAnchorsId() {
     $('a').each(function() {
         var attributes = getTagAttributes($(this));
         if (!!attributes.id) {
+            var $parent = $(this).parent();
+            if (!$parent.length) return;
+
             var parentAttributes = getTagAttributes($(this).parent());
             if (!parentAttributes.id) {
                 parentAttributes.id = attributes.id;
