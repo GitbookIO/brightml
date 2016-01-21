@@ -30,20 +30,22 @@ function formatTables() {
         $table = $(this);
         // If <table> has children
         if (!!$(this).children().length) {
+            // Move <caption> if any
+            $caption = $table.find('caption');
+            if (!!$caption.length) {
+                $caption.insertBefore($table);
+            }
+
+            // Remove <colgroup> tags
+            $colgroup = $table.find('colgroup');
+            if (!!$colgroup.length) {
+                $colgroup.remove();
+            }
+
             // Get children
             $children = $table.children();
             // Get first child type
             var firstChildType = getTagName($children);
-
-            // First child might be a <caption>
-            if (firstChildType === 'caption') {
-                // Move it before the <table> tag
-                $caption = $table.find('caption');
-                $caption.insertBefore($table);
-                // Get actual remaining children to process
-                $children = $table.children();
-                firstChildType = getTagName($children);
-            }
 
             switch (firstChildType) {
                 // Case <tr>, move the first in a new <thead> and the others in a new <tbody>
