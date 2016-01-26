@@ -103,6 +103,10 @@ Try to set `<a>` tags `id` attribute on their direct parent if possible.
 
 This operation uses the `rules.js` file to determine which tags/attributes/schemes are allowed.
 
+#### brightml.cleanImagesInTitles()
+
+Move `<img>` tags in titles right after the concerned `<h>` tag.
+
 #### brightml.normalizeTitlesId()
 
 Set an `id` attribute on each `<h>` tag. The `id` is based on the title tag content.
