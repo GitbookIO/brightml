@@ -184,6 +184,18 @@ function normalizeTitlesId() {
     });
 };
 
+// Move <img> tags in titles
+function cleanImagesInTitles() {
+    var titles = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+
+    titles.forEach(function(title) {
+        $(title).each(function() {
+            $img = $(this).children('img');
+            $img.insertAfter($(this));
+        });
+    });
+}
+
 // Normalize an id
 function normalizeId(id) {
     // Replace any non alpha-numeric character by an hyphen
@@ -320,6 +332,7 @@ function clean(html) {
     retrieveFootnotes();
     setAnchorsId();
     cleanElements();
+    cleanImagesInTitles();
     normalizeTitlesId();
     // Cleanup tables
     removeNestedTables();
@@ -339,5 +352,6 @@ module.exports = {
     normalizeTitlesId: normalizeTitlesId,
     removeNestedTables: removeNestedTables,
     formatTables: formatTables,
-    cleanTableCells: cleanTableCells
+    cleanTableCells: cleanTableCells,
+    cleanImagesInTitles: cleanImagesInTitles
 };
